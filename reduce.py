@@ -1,6 +1,7 @@
 from enum import Enum
 from PIL import Image, ImageDraw
 import copy
+import sys
 
 
 class Square(Enum):
@@ -96,8 +97,10 @@ class Battleship:
         return img
 
     def show(self):
-        """Show visual instance of puzzle"""
         self.generate_img().show()
+
+    def save(self):
+        self.generate_img().save("battleship.png")
 
 
 def reduce(items: list[int], bins: int, cap: int) -> Battleship:
@@ -150,6 +153,12 @@ def bin_packing_input() -> tuple[list[int], int, int]:
 
 
 if __name__ == "__main__":
+    save = True if len(sys.argv) > 1 and sys.argv[1] == "--save" else False
+
     items, bins, cap = bin_packing_input()
     puzzle = reduce(items, bins, cap)
-    puzzle.show()
+
+    if save:
+        puzzle.save()
+    else:
+        puzzle.show()
