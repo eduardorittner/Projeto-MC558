@@ -2,6 +2,7 @@ from enum import Enum
 from PIL import Image, ImageDraw
 import copy
 import sys
+from typing import Dict, Self
 
 
 class Square(Enum):
@@ -101,6 +102,23 @@ class Battleship:
 
     def save(self):
         self.generate_img().save("battleship.png")
+
+    # Returns a new problem instance with the solution
+    def solve(self, solution: Dict[int, int]) -> Self:
+        def get_ship_index(item: int, bin: int) -> tuple[int, int]:
+            col = (bin * 2) + 1
+            row = sum(self.fleet[:item]) + item + 1
+            return (row, col)
+
+        def set_ship(puzzle: Battleship, row: int, col: int, length: int):
+            for i in range(length):
+                puzzle.grid[row + i][col] = Square.SHIP
+
+        solved = copy.deepcopy(self)
+        for item, bin in solution.items():
+            set_ship(solved, *get_ship_index(item, bin), self.fleet[item])
+
+        return solved
 
 
 def reduce(items: list[int], bins: int, cap: int) -> Battleship:
