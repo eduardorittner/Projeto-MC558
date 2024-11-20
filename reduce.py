@@ -5,7 +5,7 @@ import sys
 from typing import Dict, Self
 
 
-class Square(Enum):
+class Tile(Enum):
     UNKNOWN = 0
     WATER = 1
     SHIP = 2
@@ -16,7 +16,7 @@ class Battleship:
         self,
         nrows: int,
         ncols: int,
-        initial: list[list[Square]],
+        initial: list[list[Tile]],
         row_tallies: list[int],
         col_tallies: list[int],
         fleet: list[int],
@@ -46,10 +46,10 @@ class Battleship:
         self.fleet = fleet
         self.grid = copy.deepcopy(self.initial)
 
-    def generate_img(self, square_size=20):
+    def generate_img(self, tile_size=20):
         # Calculate image height and width. 1 extra tile for text
-        width = (self.ncols + 1) * square_size
-        height = (self.nrows + 1) * square_size
+        width = (self.ncols + 1) * tile_size
+        height = (self.nrows + 1) * tile_size
 
         # Create image
         img = Image.new("RGB", (width, height), (255, 255, 255))
@@ -63,18 +63,18 @@ class Battleship:
         # Choose color based on enum and fill it
         for row in range(self.nrows):
             for col in range(self.ncols):
-                if self.grid[row][col] == Square.UNKNOWN:
+                if self.grid[row][col] == Tile.UNKNOWN:
                     color = unknown_color
-                elif self.grid[row][col] == Square.WATER:
+                elif self.grid[row][col] == Tile.WATER:
                     color = water_color
-                elif self.grid[row][col] == Square.SHIP:
+                elif self.grid[row][col] == Tile.SHIP:
                     color = ship_color
                 else:
-                    raise Exception("Invalid Square enum value")
+                    raise Exception("Invalid Tile enum value")
                 draw.rectangle(
                     [
-                        (col * square_size + 1, row * square_size + 1),
-                        (col * square_size + 19, row * square_size + 19),
+                        (col * tile_size + 1, row * tile_size + 1),
+                        (col * tile_size + 19, row * tile_size + 19),
                     ],
                     fill=color,
                 )
@@ -82,7 +82,7 @@ class Battleship:
         # Write row tally numbers
         for i in range(self.nrows):
             draw.text(
-                (width - 3 * square_size / 4, i * 20 + 5),
+                (width - 3 * tile_size / 4, i * 20 + 5),
                 str(self.row_tallies[i]),
                 fill=(0, 0, 0),
             )
@@ -90,7 +90,7 @@ class Battleship:
         # Write col tally numbers
         for i in range(self.ncols):
             draw.text(
-                (i * 20 + 5, height - 3 * square_size / 4),
+                (i * 20 + 5, height - 3 * tile_size / 4),
                 str(self.col_tallies[i]),
                 fill=(0, 0, 0),
             )
@@ -112,7 +112,7 @@ class Battleship:
 
         def set_ship(puzzle: Battleship, row: int, col: int, length: int):
             for i in range(length):
-                puzzle.grid[row + i][col] = Square.SHIP
+                puzzle.grid[row + i][col] = Tile.SHIP
 
         solved = copy.deepcopy(self)
         for item, bin in solution.items():
@@ -127,14 +127,14 @@ def reduce(items: list[int], bins: int, cap: int) -> Battleship:
     ncols = bins * 2
 
     # Initialize all tiles to WATER
-    initial = [[Square.WATER for _ in range(ncols)] for _ in range(nrows)]
+    initial = [[Tile.WATER for _ in range(ncols)] for _ in range(nrows)]
 
     # Set the corresponding tiles to UNKNOWN
     height = 1
     for i in range(len(items)):
         for j in range(bins):
             for k in range(items[i]):
-                initial[height + k][1 + 2 * j] = Square.UNKNOWN
+                initial[height + k][1 + 2 * j] = Tile.UNKNOWN
         height += items[i] + 1
 
     # Initialize col and row tallies
@@ -153,7 +153,7 @@ def reduce(items: list[int], bins: int, cap: int) -> Battleship:
     return Battleship(nrows, ncols, initial, row_tallies, col_tallies, fleet)
 
 
-def bin_packing_input() -> tuple[list[int], int, int]:
+def read_input() -> tuple[list[int], int, int]:
     first_line = input().split(" ")
     if len(first_line) != 3:
         raise Exception(f"Expected 3 numbers in input, got {len(first_line)}")
@@ -173,7 +173,7 @@ def bin_packing_input() -> tuple[list[int], int, int]:
 if __name__ == "__main__":
     save = True if len(sys.argv) > 1 and sys.argv[1] == "--save" else False
 
-    items, bins, cap = bin_packing_input()
+    items, bins, cap = read_input()
     puzzle = reduce(items, bins, cap)
 
     if save:

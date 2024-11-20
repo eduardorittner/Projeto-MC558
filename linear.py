@@ -1,9 +1,9 @@
 from pulp import *
-from reduce import bin_packing_input, reduce
+from reduce import read_input, reduce
 import sys
 
 
-def bin_packing_full_bins(items, num_bins, cap) -> None | Dict[int, int]:
+def solve_binpack(items, num_bins, cap) -> None | Dict[int, int]:
     num_items = len(items)
 
     # Create the model
@@ -62,8 +62,8 @@ if __name__ == "__main__":
     save = True if len(sys.argv) > 1 and sys.argv[1] == "--save" else False
     show = True if len(sys.argv) > 1 and sys.argv[1] == "--show" else False
 
-    items, bins, cap = bin_packing_input()
-    solution = bin_packing_full_bins(items, bins, cap)
+    items, bins, cap = read_input()
+    solution = solve_binpack(items, bins, cap)
 
     if solution:
         print("Solution:")
